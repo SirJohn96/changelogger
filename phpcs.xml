@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ruleset name="PHP_CodeSniffer">
+  <description>The coding standard for ChangeLogger.</description>
+
+  <file>bin/changelogger</file>
+  <file>src</file>
+
+  <arg name="basepath" value="."/>
+  <arg name="colors"/>
+  <arg value="np"/>
+
+  <rule ref="PSR12"/>
+
+</ruleset>

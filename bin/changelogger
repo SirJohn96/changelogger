@@ -1,0 +1,116 @@
+#!/usr/bin/env php
+<?php
+
+define('CHANGELOGGER_VERSION', '1.0.0-dev');
+define('CHANGELOG_FILE', 'CHANGELOG.md');
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Changelogger\Changelog;
+use Changelogger\Item;
+use Changelogger\Parser;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+$application = new Application('ChangeLogger', CHANGELOGGER_VERSION);
+$input = new ArgvInput();
+$output = new ConsoleOutput();
+$io = new SymfonyStyle($input, $output);
+
+/**
+ * Sets up the 'update' command.
+ */
+$application->register('update')->setCode(function () use ($io) {
+    $git_url = $io->ask('What repository is this for? (ex: https://github.com/SirJohn96/changelogger)');
+    $update_types = ['Added', 'Changed', 'Deprecated', 'Removed', 'Fixed', 'Security'];
+
+    // Create changelog file if it does not exist.
+    if (!file_exists(CHANGELOG_FILE)) {
+        file_put_contents(CHANGELOG_FILE, Changelog::default($git_url));
+    }
+
+    // Parse changelog file into an object.
+    $parser = new Parser(file_get_contents(CHANGELOG_FILE), $git_url, $update_types, false);
+    $changelog = $parser->parse();
+
+    $type = $io->choice('What kind of change do you want to report?', $update_types);
+
+    $item = new Item();
+
+    $message = ($type === 'Security') ? $io->ask('What has been secured?') : $io->ask('What has been ' . strtolower($type) . '?');
+    $message = ucfirst($message);
+    $message = trim(rtrim($message, '.'));
+
+    $item->setMessage($message);
+
+    do {
+        $none = 'leave empty if none';
+        $issue_id = $io->ask('Is there any related issue id? (ex: 1224)', $none);
+        $issue_id_regex = "#^(\d+)$#";
+
+        if ($issue_id === $none) {
+            break;
+        }
+
+        if (preg_match($issue_id_regex, $issue_id, $matches)) {
+            $reference_id = $matches[1];
+            $issue_url = $git_url . '/issues/' . $reference_id;
+            $item->addReference($reference_id);
+            $changelog->addReference($reference_id, $issue_url);
+        } else {
+            $io->warning("Issue ID should be a valid integer. Ex: 3423");
+        }
+    } while (true);
+
+    $changelog->findUnreleased($git_url)->addUpdate($type, $item);
+
+    file_put_contents(CHANGELOG_FILE, (string)$changelog);
+    $io->success(CHANGELOG_FILE . ' updated!');
+});
+
+/**
+ * Sets up the 'release' command.
+ */
+$application->register('release')->setCode(function () use ($io) {
+    $git_url = $io->ask('What repository is this for? (ex: https://github.com/SirJohn96/changelogger)');
+    $update_types = ['Added', 'Changed', 'Deprecated', 'Removed', 'Fixed', 'Security'];
+
+    // Create changelog file if it does not exist.
+    if (!file_exists(CHANGELOG_FILE)) {
+        file_put_contents(CHANGELOG_FILE, Changelog::default($git_url));
+    }
+
+    // Parse changelog file into an object.
+    $parser = new Parser(file_get_contents(CHANGELOG_FILE), $git_url, $update_types, false);
+    $changelog = $parser->parse();
+
+    $latest = $changelog->findLatest() ? $changelog->findLatest()->getVersion() : 'Unreleased';
+
+    do {
+        $version = $io->ask("What version will be released? (latest: {$latest})");
+        if (!preg_match('/^ \d+\.\d+\.\d+(-[\w\.]+)? $/x', $version)) {
+            $io->warning('Version number must follow semantic versioning.');
+            continue;
+        }
+        break;
+    } while (true);
+
+    do {
+        $date = $io->ask('What date will it be released?', date('Y-m-d'));
+        if (!preg_match('/^ [0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) $/x', $date)) {
+            $io->warning('Date input is invalid.');
+            continue;
+        }
+        break;
+    } while (true);
+
+    $changelog->findUnreleased($git_url)->setVersion($version, $date);
+
+    file_put_contents(CHANGELOG_FILE, (string)$changelog);
+    $io->success(CHANGELOG_FILE . " updated to $version");
+});
+
+// Runs the CLI application.
+$application->run();

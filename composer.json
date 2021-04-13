@@ -1,0 +1,26 @@
+{
+    "name": "sirjohn96/changelogger",
+    "description": "A tool for generating and managing changelog files.",
+    "type": "project",
+    "require": {
+        "symfony/console": "5.x-dev"
+    },
+    "authors": [
+        {
+            "name": "Sirod Johnson",
+            "email": "SirodTJ@gmail.com"
+        }
+    ],
+    "bin": [
+        "bin/changelogger"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Changelogger\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require-dev": {
+        "squizlabs/php_codesniffer": "4.0.x-dev"
+    }
+}
