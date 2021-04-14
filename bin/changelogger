@@ -4,7 +4,16 @@
 define('CHANGELOGGER_VERSION', '1.0.0-beta2');
 define('CHANGELOG_FILE', 'CHANGELOG.md');
 
-require __DIR__ . '/../vendor/autoload.php';
+$autoload = [
+    __DIR__ . '/../../../autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+];
+
+for ($i = 0; $i < count($autoload); $i++) {
+    if (file_exists($autoload[$i])) {
+        require $autoload[$i];
+    }
+}
 
 use Changelogger\Changelog;
 use Changelogger\Item;
