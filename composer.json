@@ -3,8 +3,8 @@
     "description": "A tool for generating and managing changelog files.",
     "type": "project",
     "require": {
-        "symfony/console": "5.x-dev",
-        "symfony/process": "5.x-dev"
+        "symfony/console": "^5.2",
+        "symfony/process": "^5.2"
     },
     "authors": [
         {
@@ -21,6 +21,7 @@
         }
     },
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require-dev": {
         "squizlabs/php_codesniffer": "4.0.x-dev"
     }
