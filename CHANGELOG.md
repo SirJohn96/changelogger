@@ -6,9 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased] -
-[Unreleased]: https://github.com/SirJohn96/changelogger/compare/1.0.0-beta2...Unreleased
+## [1.0.0-beta3] - 2021-04-22
+[1.0.0-beta3]: https://github.com/SirJohn96/changelogger/compare/1.0.0-beta2...1.0.0-beta3
 
+### Added
+- Support for GitLab repository URLs.
 ### Fixed
 - Issue preventing the CLI from loading when package is added as a composer dependency within another project.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-define('CHANGELOGGER_VERSION', '1.0.0-dev');
+define('CHANGELOGGER_VERSION', '1.0.0-beta3');
 define('CHANGELOG_FILE', 'CHANGELOG.md');
 
 $autoload = [
