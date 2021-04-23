@@ -29,6 +29,13 @@ class Version
     private $gitUrl;
 
     /**
+     * Repository service.
+     *
+     * @var string
+     */
+    private $service;
+
+    /**
      * A date formatted in YYYY-MM-DD.
      *
      * @var string
@@ -83,9 +90,10 @@ class Version
      * @param string $git_url
      *   The base git repository URL.
      */
-    public function __construct($git_url)
+    public function __construct($git_url, $service)
     {
         $this->gitUrl = $git_url;
+        $this->service = $service;
     }
 
     /**
@@ -95,12 +103,22 @@ class Version
      */
     public function __toString()
     {
-        if ($this->previous) {
-            $reference = "[$this->version]: $this->gitUrl/compare/$this->previous...$this->version";
-        } elseif (!$this->previous && $this->version !== 'Unreleased') {
-            $reference = "[$this->version]: $this->gitUrl/releases/tag/$this->version";
-        } else {
-            $reference = "[$this->version]: $this->gitUrl";
+        if ($this->service == 'GitHub') {
+            if ($this->previous) {
+                $reference = "[$this->version]: $this->gitUrl/compare/$this->previous...$this->version";
+            } elseif (!$this->previous && $this->version !== 'Unreleased') {
+                $reference = "[$this->version]: $this->gitUrl/releases/tag/$this->version";
+            } else {
+                $reference = "[$this->version]: $this->gitUrl";
+            }
+        } elseif ($this->service == 'GitLab') {
+            if ($this->previous) {
+                $reference = "[$this->version]: $this->gitUrl/compare/$this->previous...$this->version";
+            } elseif (!$this->previous && $this->version !== 'Unreleased') {
+                $reference = "[$this->version]: $this->gitUrl/tags/$this->version";
+            } else {
+                $reference = "[$this->version]: $this->gitUrl";
+            }
         }
 
         $format_entry = function (Item $item) {

@@ -47,12 +47,14 @@ class Parser
      *
      * @param string $changelog
      * @param string $git_url
+     * @param string $service
      * @param array $update_types
      */
-    public function __construct(string $changelog, string $git_url, array $update_types)
+    public function __construct(string $changelog, string $git_url, string $service, array $update_types)
     {
         $this->tokens = array_map('trim', explode("\n", $changelog));
         $this->gitUrl = $git_url;
+        $this->service = $service;
         $this->updateTypes = $update_types;
     }
 
@@ -114,7 +116,7 @@ class Parser
     private function parseVersion()
     {
         if ($this->isVersionString($this->next(), $matches)) {
-            $version = new Version($this->gitUrl);
+            $version = new Version($this->gitUrl, $this->service);
             if (isset($matches[4])) {
                 $version->setVersion($current = $matches[1], $matches[4]);
             } else {
@@ -128,8 +130,13 @@ class Parser
 
             $previous = '\d+\.\d+\.\d+(-[\w\.]+)?';
             $url = preg_quote($this->gitUrl, '/');
-            $regex_compare = "/^ \[$current\]\: \s $url\/compare\/($previous)\.\.\.$current $/x";
-            $regex_first_tag = "/^ \[$current\]\: \s $url\/releases\/tag\/$current $/x";
+            if ($this->service == 'GitHub') {
+                $regex_compare = "/^ \[$current\]\: \s $url\/compare\/($previous)\.\.\.$current $/x";
+                $regex_first_tag = "/^ \[$current\]\: \s $url\/releases\/tag\/$current $/x";
+            } elseif ($this->service == 'GitLab') {
+                $regex_compare = "/^ \[$current\]\: \s $url\/compare\/($previous)\.\.\.$current $/x";
+                $regex_first_tag = "/^ \[$current\]\: \s $url\/tags\/$current $/x";
+            }
             $regex_first_tag_unreleased = "/^ \[$current\]\: \s $url $/x";
 
             if (preg_match($regex_compare, $compareLink, $matches)) {

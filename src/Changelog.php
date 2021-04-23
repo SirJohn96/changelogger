@@ -2,6 +2,9 @@
 
 namespace Changelogger;
 
+use RuntimeException;
+use Symfony\Component\Process\Process;
+
 /**
  * Class used for objects representing changelog files.
  */
@@ -107,7 +110,7 @@ class Changelog
             }
         }
 
-        $version = new Version($git_url);
+        $version = new Version($git_url, $this->service);
         $version->setVersion('Unreleased');
         $version->setPrevious($this->findLatest()->getVersion());
         $this->prependVersion($version);
@@ -154,6 +157,29 @@ class Changelog
     public function addReference(int $reference_id, string $url)
     {
         $this->references[$reference_id] = $url;
+    }
+
+    /**
+     * Attempts to get a default Git URL.
+     *
+     * @return string
+     *   The discovered git URL.
+     */
+    public static function getDefaultGitUrl() {
+        $default = '';
+        try {
+            $process = Process::fromShellCommandline('git remote get-url origin');
+            $default = $process->mustRun()->getOutput();
+            $default = trim($default);
+        } catch (RuntimeException $e) {}
+
+        if (preg_match('/.git$/', $default)) {
+            $default = preg_replace('/^git@/', '', $default);
+            $default = preg_replace('/.git$/', '', $default);
+            $default = 'https://' . str_replace(':', '/', $default);
+        }
+
+        return $default;
     }
 
     /**
