@@ -22,6 +22,13 @@ class Parser
     private $gitUrl;
 
     /**
+     * The git repository service.
+     *
+     * @var string
+     */
+    private $service;
+
+    /**
      * The types of updates.
      *
      * @var array
@@ -98,7 +105,7 @@ class Parser
     private function parseTitle()
     {
         if (preg_match('/# (.+)/', $this->next(), $matches)) {
-            $changelog = new Changelog();
+            $changelog = new Changelog($this->service);
             $changelog->setTitle($matches[1]);
 
             return $changelog;

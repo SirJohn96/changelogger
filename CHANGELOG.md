@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.0.0-beta4] - 2021-04-23
+[1.0.0-beta4]: https://github.com/SirJohn96/changelogger/compare/1.0.0-beta3...1.0.0-beta4
+
+### Changed
+- Versions of the dependencies to stable versions.
+### Fixed
+- Issue preventing compare links from being generated.
+
+
 ## [1.0.0-beta3] - 2021-04-22
 [1.0.0-beta3]: https://github.com/SirJohn96/changelogger/compare/1.0.0-beta2...1.0.0-beta3
 

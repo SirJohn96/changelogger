@@ -25,11 +25,30 @@ class Changelog
     public $versions = [];
 
     /**
+     * The git repository service.
+     *
+     * @var string
+     */
+    public $service;
+
+    /**
      * The URL references.
      *
      * @var array
      */
     private $references = [];
+
+
+    /**
+     * Constructs the Changelog object.
+     *
+     * @param string $git_url
+     * @param string $service
+     */
+    public function __construct($service)
+    {
+        $this->service = $service;
+    }
 
     /**
      * Translates object into a string format.
